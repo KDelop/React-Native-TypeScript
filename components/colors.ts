@@ -1,0 +1,11 @@
+export const BRAND_RED = '#7C1315';
+export const LIGHT_BRAND_RED = '#ae1719';
+export const BRAND_BLUE = '#142A4A';
+export const LIGHT_BRAND_BLUE = '#254d88';
+export const LIGHT_GREY = '#AAB2B7';
+export const MESSAGE_BUBBLE_GREY = '#ebecef';
+export const BLUE_GREY = '#f7f8fa';
+export const BLUE_GREY_CONTRAST = '#8b99a8';
+export const DARK_GREY = 'rgba(57, 57, 57, 1)';
+export const MEDIUM_GREY = '#696969';
+export const DROP_SHADOW = '#464656';

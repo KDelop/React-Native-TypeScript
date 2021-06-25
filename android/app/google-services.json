@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "287312001728",
+    "firebase_url": "https://athleticus-d1300.firebaseio.com",
+    "project_id": "athleticus-d1300",
+    "storage_bucket": "athleticus-d1300.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:287312001728:android:668ba9f39d1bbf7f77cb25",
+        "android_client_info": {
+          "package_name": "com.athleticus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "287312001728-fr51fgodh4gjv3p3otv26ua89i5n480k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXk5uWfINnN7jcCg7asBoKNCClYrkMpXo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "287312001728-fr51fgodh4gjv3p3otv26ua89i5n480k.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "287312001728-l07005f1k8npsrljuafddg48urkd743c.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.athleticus.athleticusIOS"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
