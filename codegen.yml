@@ -1,0 +1,5 @@
+schema: ../athleticus-serverless/schema.graphql
+documents: null
+generates:
+  types/graphql.d.ts:
+    - typescript

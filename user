@@ -1,0 +1,455 @@
+\c athleticus 
+ls
+\dt
+clear
+quit
+\q
+\q
+\c athleticus 
+\dt
+\t
+\d
+\s
+\q
+\q
+\q
+\dt
+\t
+\d
+\c athleticus 
+\dt
+\q
+\c athleticus 
+\dt
+SELECT firstName, lastName FROM 'users';
+SELECT firstName, lastName FROM "users";
+SELECT firstName, lastName FROM users
+;
+SELECT firstName, lastName FROM "user";
+SELECT user.firstName, user.lastName FROM "user";
+SELECT id, "user.firstName", "user.lastName" FROM "user";
+SELECT * FROM "user";
+SELECT * FROM "user";
+SELECT * FROM "user";
+c;ear
+clear
+;
+\dt
+\d user_follower
+insert into user_follower ("approved", "fromUserId", "toUserId") values (t, 1, 3);
+insert into user_follower ("approved", "fromUserId", "toUserId") values (TRUE, 1, 3);
+insert into user_follower ("approved", "fromUserId", "toUserId") values (TRUE, 3, 1);
+\q
+\c athleticus 
+\dt
+select * from "user";
+select firstName from "user";
+select (firstName) from "user";
+clear
+;
+select "user.firstName" from "user"
+;
+select "user.firstName" from "user" as "user";
+\d user
+\d user
+select "firstName" from "user" ;
+select "firstName", "lastName" from "user" ;
+select "firstName", "lastName", "email" from "user" ;
+clear
+;
+DELETE * FROM "user";
+DELETE FROM "user";
+\dt
+\q
+\c athleticus 
+\dty
+select "firstName", "lastName", "email" from "Users"
+;
+select "firstName", "lastName", "email" from "User";
+select "firstName", "lastName", "email" from "user";
+\q
+\c athleticus 
+\dt
+select * from user_follower;
+select * from user_follower;
+select * from user_follower;
+DELETE FROM "user";
+select * from user_follower;
+select * from "user";
+select * from user_follower;
+DELETE FROM "user";
+select * from user_follower;
+select * from "user";
+DELETE FROM "user";
+DELETE FROM "user";
+DELETE FROM "user";
+select * from user_follower;
+DELETE FROM "user";
+select * from user_follower;
+DELETE FROM "user";
+select * from user_follower;
+select * from user_follower;
+select * from "user";
+select * from "user";
+DELETE FROM "user";
+DELETE FROM "user";
+select * from user_follower;
+select * from user_follower;
+select * from "user";
+select "firstName", "lastName" from "user";
+select * from user_follower;
+DELETE FROM "user";
+select * from user_follower;
+select * from user_follower;
+DELETE FROM "user";
+select * from user_follower;
+DELETE FROM "user";
+DELETE FROM "user";
+DELETE FROM "user";
+select * from user_follower;
+DELETE FROM "user";
+select * from user_follower;
+DELETE FROM "user";
+DELETE FROM "user";
+DELETE FROM "user";
+DELETE FROM "user";
+DELETE FROM "user";
+clear
+\q
+\c athleticus 
+select "email" from "user"
+;
+delete from "user";
+\q
+\c athleticus 
+select "firstName" from "user";
+select * from user_follower;
+\q
+\c athleticus 
+select "email", "password" from "user";
+select "email" from "user";
+select "email" from "user";
+select "email" from "user" limit 1;
+\q
+\c athleticus 
+select "firstName" from "user"
+;
+select "email" from "user";
+select "email", "password" from "user";
+select "email" from "user";
+clear
+\q
+\c athleticus 
+select id from "user";
+select id from "user";
+\q
+\c
+update "user" set "firstName"="Lu", "lastName"="Xiaojun", "email"="lu.xiaojun@athleticus.io" where id = 104;
+\c athleticus 
+update "user" set "firstName"="Lu", "lastName"="Xiaojun", "email"="lu.xiaojun@athleticus.io" where id = 104;
+update "user" set "firstName"='Lu', "lastName"='Xiaojun', "email"='lu.xiaojun@athleticus.io' where id = 104;
+select "email" from "user";
+select "email", "id" from "user";
+select "email", "id" from "user" order by id dev;
+select "email", "id" from "user" order by id desc;
+select "email", "id" from "user" order by id asc;
+select * from "user" where id = 104;
+\x on
+select * from "user" where id = 104;
+update "user" set "city"='Shenzen', "country"='China', "sex"='male', "weight"=81, "height"=5.7;
+update "user" set "city"=NULL, "country"=NULL, "sex"=NULL, "weight"=NULL, "height"=NULL;
+update "user" set "city"='Shenzen', "country"='China', "sex"='male', "weight"=81, "height"=5.7 where id = 104;
+\q
+\c athleticus 
+update "user" set "city" = 'Boston', "country" = 'USA';
+\q
+\c athleticus
+\t
+\d
+\t
+\l
+CREATE DATABASE athleticus OWNER postgres;
+\l
+\c athleticus
+\l
+\d
+\dt
+\q
+\q
+\q
+\l
+\c athleticus 
+\dt
+\d user
+select *
+from INFORMATION_SCHEMA.COLUMNS
+;
+select table_name, 
+       column_name 
+from INFORMATION_SCHEMA.COLUMNS 
+where data_type = 'character varying' ;
+select table_name, 
+       column_name 
+from INFORMATION_SCHEMA.COLUMNS 
+where data_type = 'character varying' and table_name = 'athleticus';
+select table_name, 
+       column_name 
+from INFORMATION_SCHEMA.COLUMNS 
+where data_type = 'character varying' and column_name = 'password';
+select table_name, 
+       column_name, character_maximum_length 
+from INFORMATION_SCHEMA.COLUMNS 
+where data_type = 'character varying' and column_name = 'password';
+clear
+\q
+\c athleticus
+\dt
+\t user
+\d user
+\q
+CREATE USER 'lambda' IDENTIFIED WITH AWSAuthenticationPlugin as 'RDS';
+GRANT ALL PRIVILEGES ON <DB_NAME>.* TO 'lambda'@'%';
+\l
+CREATE USER "lambda" IDENTIFIED WITH AWSAuthenticationPlugin as "RDS";
+create user "lambda";
+grant rda_iam to lambda
+;
+\du
+grant rds_iam to lambda;
+\c athleticus
+\q
+\c athleticus
+\dt
+\dt user
+\d user
+select * from "user";
+\q
+\c athleticus
+\dt
+clear
+;
+grant all privileges on athleticus to lambda
+;
+\q
+\du
+\du
+GRANT ALL PRIVILEGES ON athleticus TO lambda;
+GRANT ALL PRIVILEGES ON DATABASE athleticus TO lambda;
+\du
+\\l
+\l
+\c athleticus
+\dt
+\q
+\du
+\c athleticus
+\dt
+\d
+\t
+\t
+GRANT SELECT, INSERT, UPDATE, DELETE
+ON ALL TABLES IN SCHEMA public 
+TO lambda;
+select * from "user"
+;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO lambda;
+select * from "user"
+;
+clear
+\q
+\c athleticus
+select last_login_at from "user"
+;
+select last_login_at, created_at from "user"
+;
+clear
+\q
+\c athleticus
+\q
+\c athleticus 
+delete from "user" where id = 3;
+\q
+\c athleticus
+\d user
+\d user
+\d user
+DROP TABLE "user";
+\d
+\dt
+\l
+\dt
+\d user
+\dt
+\d
+\d
+\d
+\dt
+\t
+\t
+\d
+\d user
+\c athleticus
+\d
+ls
+\d
+;
+\d
+\d
+\d
+\d
+\d
+\d user
+\q
+\c athleticus
+\dt
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+\l
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO lambda;
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+\dt
+\d
+\t
+\t
+\dt
+\dt user
+\d user
+\d user
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO lambda;
+select * from "user";
+GRANT ALL PRIVILEGES ON ALL IN SCHEMA public TO lambda;
+GRANT ALL PRIVILEGES ON ALL *  IN SCHEMA public TO lambda;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO lambda;
+select * from "user";
+select * from "user";
+delete * from "user";
+delete from "user" where id > 0;
+delete from "user" where id > 0;
+select * from "user";
+select * from "user";
+select * from "user";
+delete from "user" where id > 0;
+delete from "user" where id > 0;
+select * from "user";
+select * from "user";
+select * from "user";
+delete from "user" where id > 0;
+select * from "user";
+select * from "user";
+select * from "user";
+delete from "user" where id > 0;
+select * from "user";
+delete from "user" where id > 0;
+select * from "user";
+delete from "user" where id > 0;
+delete from "user" where id > 0;
+select * from "user";
+select * from "user";
+delete from "user" where id > 0;
+select * from "user";
+select * from "user";
+select * from "user";
+\x on
+select * from "user";
+select * from "user";
+select * from "user";
+select * from "user";
+delete from "user" where id > 0;
+\dt user
+\d user
+\d user
+delete from "user" where id > 0;
+delete from "user" where id > 0;
+\q
+\c athleticus
+delete * from "user" were id > 0;
+delete * from "user" where id > 0;
+delete from "user" where id > 0;
+select * from "user";
+\x on
+select * from "user";
+\q
+\c athleticus
+delete from "user" where email = "greg@studable.com";
+delete from "user" where email = 'greg@studable.com';
+\q
+\c athleticus
+select * from user;
+select * from "user";
+delete from "user" where id = 43;
+\q
+\c athletcus
+athleticus
+l
+;
+\c athleticus
+delete from "user" where email = 'greg@studable.com';
+\q
+\c athleticus
+\x
+select * from "user";
+select * from "user";
+delete * from "user" where email = 'greg@studable.com';
+deletefrom "user" where email = 'greg@studable.com';
+delete from "user" where email = 'greg@studable.com';
+select * from "user";
+select * from "user";
+\q
+\c athleticus
+\dt user
+\d user
+\q
+\c athleticus
+\d user
+\q
+\c athleticus
+select * from "user";
+\x
+select * from "user";
+select * from "user";
+update "user" set is_pro = t where email = "gjordan@umassd.edu";
+update "user" set is_pro = t where email = 'gjordan@umassd.edu';
+update "user" set is_pro = true where email = 'gjordan@umassd.edu';
+select * from "user";
+\q
+\c athleticus
+\x
+select * as "user";
+select * from "user";
+delete from "user" where email = "slappyjaw@gmail.com"
+;
+delete from "user" where email = 'slappyjaw@gmail.com';
+\q
+\c athleticus
+\dt user
+\d use
+\d user
+\w
+\s user

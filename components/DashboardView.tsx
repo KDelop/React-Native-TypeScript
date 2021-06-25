@@ -1,49 +1,23 @@
 import * as React from 'react';
-import {StyleSheet, ScrollView, View, Dimensions} from 'react-native';
-import messaging from '@react-native-firebase/messaging';
+import { View, StyleSheet } from 'react-native';
 
 import DashboardHeader from './DashboardHeader';
-import useUpdateFCMToken from '../hooks/useUpdateFCMToken';
-import {BLUE_GREY} from './colors';
-import {UserContext} from './UserProvider';
-import DashboardSchedule from './DashboardSchedule';
-import DashboardHealthStats from './DashboardHealthStats';
-import DashboardMore from './DashboardMore';
+import AppContainer from './AppContainer';
 
-const requestPermissions = async () => {
-  await messaging().requestPermission();
-};
-
-const DashboardView = () => {
-  useUpdateFCMToken();
-  const userContext = React.useContext(UserContext);
-
-  React.useEffect(() => {
-    requestPermissions();
-  }, []);
-
+const DashboardView: React.SFC = () => {
   return (
-    <>
-      <DashboardHeader userId={userContext.user?.uid} />
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={{paddingBottom: 50}}
-        showsVerticalScrollIndicator={false}>
-        <DashboardSchedule />
-        <DashboardHealthStats />
-        <DashboardMore />
-      </ScrollView>
-    </>
+    <AppContainer bottomNavigation>
+      <DashboardHeader>Dashboard</DashboardHeader>
+      <View style={styles.content}></View>
+    </AppContainer>
   );
 };
 
 const styles = StyleSheet.create({
-  schedule: {
-    backgroundColor: 'white',
-  },
-  scrollView: {
-    backgroundColor: BLUE_GREY,
-  },
+  content: {
+    paddingLeft: '5%',
+    paddingRight: '5%'
+  }
 });
 
 export default DashboardView;

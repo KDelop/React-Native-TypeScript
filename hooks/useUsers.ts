@@ -1,48 +1,27 @@
-import {gql, NetworkStatus, useQuery} from '@apollo/client';
+import { gql } from 'apollo-boost';
+import { useQuery } from '@apollo/react-hooks';
 
-import {IUser, Data} from '../types';
+import { Query } from '../types/graphql';
 
-const EXPLORE_QUERY = gql`
-  query Explore {
-    users {
-      nodes {
+const ALL_USERS = gql`
+  query AllUsers {
+    allUsers {
+      nextOffset
+      users {
         id
-        firstName
-        lastName
-        city
-        state
-        isPro
+        name
+        teammateStatus
       }
     }
   }
 `;
 
-const useUsers = (): Data<ReadonlyArray<IUser>> => {
-  const {networkStatus, error, data, refetch} = useQuery(EXPLORE_QUERY, {
-    fetchPolicy: 'cache-and-network',
+type Response = { allUsers?: Query['allUsers'] };
+
+export default function useFollowing() {
+  const { data, loading, error, refetch } = useQuery<Response>(ALL_USERS, {
+    fetchPolicy: 'cache-and-network'
   });
 
-  if (error) {
-    return {
-      status: 'error',
-      data: error,
-      refetch,
-    };
-  }
-
-  if (networkStatus === NetworkStatus.loading) {
-    return {
-      status: 'loading',
-      data: null,
-      refetch,
-    };
-  }
-
-  return {
-    status: 'success',
-    data: data?.users?.nodes,
-    refetch,
-  };
-};
-
-export default useUsers;
+  return [error, loading, data?.allUsers?.users ?? [], refetch] as const;
+}

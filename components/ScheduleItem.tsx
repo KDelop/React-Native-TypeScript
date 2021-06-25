@@ -1,110 +1,59 @@
 import * as React from 'react';
-import IonIcon from 'react-native-vector-icons/Ionicons';
-import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {StyleSheet, View, TouchableOpacity} from 'react-native';
-import {format} from 'date-fns';
+import { View, StyleSheet } from 'react-native';
+import AntIcon from 'react-native-vector-icons/AntDesign';
 
-import Padded from './designSystem/Padded';
-import Typography from './designSystem/Typography';
-import {IGenericParticipant} from '../types';
-import FacePile from './designSystem/FacePile';
-import {UserContext} from './UserProvider';
-import {BRAND_BLUE, LIGHT_GREY} from './colors';
-import Badge from './designSystem/Badge';
-import Card from './designSystem/Card';
+import { LIGHT_GREY, MEDIUM_GREY, DARK_GREY } from '../constants/colors';
+import Typography from './Typography';
 
 interface IProps {
-  title: string;
-  description: string;
-  startAt: number;
-  isFirstItem: boolean;
-  attendees: Array<IGenericParticipant>;
-  type: 'STREAM' | 'GROUP_CALL';
-  initiatedBy: IGenericParticipant;
-  onPress(): void;
+  title: React.ReactNode;
+  summary: React.ReactNode;
+  gutterBottom?: boolean;
 }
 
-const ScheduleItem: React.FunctionComponent<IProps> = ({
-  title,
-  startAt,
-  isFirstItem,
-  attendees,
-  type,
-  initiatedBy,
-  onPress,
-}) => {
-  const userContext = React.useContext(UserContext);
-
+const ScheduleItem: React.SFC<IProps> = ({ title, summary, gutterBottom }) => {
   return (
-    <Padded size={{left: 3, right: 3, top: isFirstItem ? 5 : 0, bottom: 3}}>
-      <Card disableDropShadow borderRadiusSize="small">
-        <TouchableOpacity onPress={onPress}>
-          <Padded
-            size={{top: 3, bottom: 3, right: 4, left: 4}}
-            style={styles.root}>
-            <Padded size={{right: 5}}>
-              {type === 'GROUP_CALL' ? (
-                <IonIcon name="videocam" size={24} color={BRAND_BLUE} />
-              ) : (
-                <IonIcon name="radio-outline" size={24} color={BRAND_BLUE} />
-              )}
-            </Padded>
-            <View style={styles.content}>
-              <View>
-                <Typography variant="scheduleItemTitle">{title}</Typography>
-                <Padded size={{bottom: 1, top: 0.5}}>
-                  <Typography variant="scheduleItemDescription">
-                    {initiatedBy.firstName} {initiatedBy.lastName} //{' '}
-                    {initiatedBy.isPro ? 'Pro' : 'Athlete'}
-                  </Typography>
-                </Padded>
-                <View style={styles.timestamp}>
-                  <Padded size={{right: 1}}>
-                    <MaterialIcon
-                      name="clock-time-seven"
-                      size={12}
-                      color={LIGHT_GREY}
-                    />
-                  </Padded>
-                  <Typography variant="scheduleItemTertiary">
-                    {format(startAt, 'p')}
-                  </Typography>
-                </View>
-              </View>
-              {attendees.length > 1 ? (
-                <FacePile
-                  userIds={attendees
-                    .map((x) => x.id)
-                    .filter((x) => x !== userContext.user?.uid)}
-                />
-              ) : (
-                <Badge>PUBLIC</Badge>
-              )}
-            </View>
-          </Padded>
-        </TouchableOpacity>
-      </Card>
-    </Padded>
+    <View style={[styles.container, gutterBottom && styles.gutterBottom]}>
+      <AntIcon name="calendar" size={26} color={LIGHT_GREY} />
+      <View style={[styles.textContainer]}>
+        <Typography style={[styles.title]} variant="title2">
+          {title}
+        </Typography>
+        <Typography style={[styles.summary]} variant="body2">
+          {summary}
+        </Typography>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  root: {
+  container: {
     flex: 0,
-    flexDirection: 'row',
     alignItems: 'center',
-  },
-  content: {
-    flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    padding: 12,
+    borderRadius: 6,
+    backgroundColor: '#FFF',
+    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    marginLeft: 12,
+    marginRight: 12
   },
-  timestamp: {
-    flex: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
+  title: {
+    color: DARK_GREY
   },
+  summary: {
+    color: MEDIUM_GREY
+  },
+  gutterBottom: {
+    marginBottom: 12
+  },
+  textContainer: {
+    marginLeft: 12
+  }
 });
 
 export default ScheduleItem;

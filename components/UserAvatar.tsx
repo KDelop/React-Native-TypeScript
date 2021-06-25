@@ -1,124 +1,120 @@
 import * as React from 'react';
+import { PlaceholderMedia, Placeholder, Fade } from 'rn-placeholder';
 import {
-  GestureResponderEvent,
-  ImageURISource,
+  StyleSheet,
+  Image,
   TouchableOpacity,
   TouchableOpacityProps,
-  View,
-  ViewStyle,
+  View
 } from 'react-native';
 
-import {LIGHT_BRAND_RED, LIGHT_GREY, MESSAGE_BUBBLE_GREY} from './colors';
-import {useModal} from '../hooks/useModal';
-import ProfilePicture, {IHandle} from './ProfilePicture';
-import {FastImageProps} from 'react-native-fast-image';
+import config from '../config.json';
 
-type ImgSize = 'tiny' | 'small' | 'medium' | 'large';
-type Halo = 'none' | 'red' | 'grey';
+const DIAMETER_SMALL = 40;
+const DIAMETER_MEDIUM = 50;
+const DIAMETER_LARGE = 60;
+const DIAMETER_X_LARGE = 80;
 
-interface IProps extends TouchableOpacityProps {
-  cache?: ImageURISource['cache'];
-  halo?: Halo;
-  haloWidth?: number;
-  userId?: string;
-  imgSize?: ImgSize;
-  diameter?: number;
-  openProfile?: boolean;
-  style?: FastImageProps['style'];
+interface IProps {
+  loading: boolean;
+  button?: boolean;
+  TouchableOpacityProps?: TouchableOpacityProps;
+  size?: 'small' | 'medium' | 'large' | 'xlarge';
+  userId?: number;
 }
 
-const getDiameter = (size: ImgSize) => {
-  switch (size) {
-    case 'tiny':
-      return 32;
-    case 'small':
-      return 56;
-    case 'medium':
-      return 128;
-    case 'large':
-      return 256;
-  }
-};
-
-const getBorderStyle = (borderStyle: Halo, diameter: number, width = 4) => {
-  if (borderStyle === 'none') return;
-
-  const baseStyles: ViewStyle = {
-    borderWidth: width,
-    // Half the diameter + left and right padding
-    borderRadius: diameter + 6 / 2,
-    padding: 3,
-  };
-
-  switch (borderStyle) {
-    case 'red':
-      return {...baseStyles, borderColor: LIGHT_BRAND_RED};
-    case 'grey':
-      return {...baseStyles, borderColor: MESSAGE_BUBBLE_GREY};
-  }
-};
-
-const UserAvatar = React.forwardRef(
-  (
-    {
-      userId,
-      cache,
-      halo = 'none',
-      haloWidth,
-      imgSize = 'small',
-      diameter,
-      onPress,
-      disabled,
-      openProfile = true,
-      style,
-      ...rest
-    }: IProps,
-    ref: React.Ref<IHandle>,
-  ) => {
-    const openModal = useModal();
-    const imgDiameter = diameter ?? getDiameter(imgSize);
-
-    const handleOnPress = (e: GestureResponderEvent) => {
-      onPress && onPress(e);
-
-      if (openProfile && userId) {
-        openModal('Profile', {userId});
-      }
-    };
-
-    const inner = (
-      <ProfilePicture
-        ref={ref}
-        userId={userId}
-        imgSize={imgSize}
-        style={[
-          {
-            height: imgDiameter,
-            width: imgDiameter,
-            borderRadius: imgDiameter / 2,
-            borderColor: LIGHT_GREY,
-          },
-          style,
-        ]}
-      />
-    );
-
+const UserAvatar: React.SFC<IProps> = ({
+  button = false,
+  size = 'small',
+  userId,
+  loading,
+  TouchableOpacityProps
+}) => {
+  if (loading) {
     return (
-      <View style={getBorderStyle(halo, imgDiameter, haloWidth)}>
-        {handleOnPress ? (
-          <TouchableOpacity
-            delayPressIn={0}
-            onPress={handleOnPress}
-            {...rest}
-            disabled={disabled}>
-            {inner}
-          </TouchableOpacity>
-        ) : (
-          inner
-        )}
+      <View
+        style={[
+          size === 'small' && styles.dimensionsSmall,
+          size === 'large' && styles.dimensionsLarge,
+          size === 'xlarge' && styles.dimensionsXLarge,
+          size === 'medium' && styles.dimensionsMedium
+        ]}
+      >
+        <Placeholder Animation={Fade}>
+          <PlaceholderMedia
+            style={[
+              styles.container,
+              size === 'small' && styles.dimensionsSmall,
+              size === 'large' && styles.dimensionsLarge,
+              size === 'xlarge' && styles.dimensionsXLarge,
+              size === 'medium' && styles.dimensionsMedium
+            ]}
+          />
+        </Placeholder>
       </View>
     );
+  }
+
+  return (
+    <TouchableOpacity
+      disabled={!button}
+      style={[
+        styles.container,
+        size === 'small' && styles.dimensionsSmall,
+        size === 'large' && styles.dimensionsLarge,
+        size === 'xlarge' && styles.dimensionsXLarge,
+        size === 'medium' && styles.dimensionsMedium
+      ]}
+      {...TouchableOpacityProps}
+    >
+      <Image
+        style={[
+          styles.image,
+          size === 'small' && styles.dimensionsSmall,
+          size === 'large' && styles.dimensionsLarge,
+          size === 'xlarge' && styles.dimensionsXLarge,
+          size === 'medium' && styles.dimensionsMedium
+        ]}
+        source={{
+          uri: `${config.apiUri}/userData/${userId}/profile.jpg`
+        }}
+        defaultSource={require('../assets/images/default-profile.png')}
+      />
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create({
+  dimensionsSmall: {
+    height: DIAMETER_SMALL,
+    width: DIAMETER_SMALL,
+    borderRadius: DIAMETER_SMALL / 2
   },
-);
+  dimensionsLarge: {
+    height: DIAMETER_LARGE,
+    width: DIAMETER_LARGE,
+    borderRadius: DIAMETER_LARGE / 2
+  },
+  dimensionsXLarge: {
+    height: DIAMETER_X_LARGE,
+    width: DIAMETER_X_LARGE,
+    borderRadius: DIAMETER_X_LARGE / 2
+  },
+  dimensionsMedium: {
+    height: DIAMETER_MEDIUM,
+    width: DIAMETER_MEDIUM,
+    borderRadius: DIAMETER_MEDIUM / 2
+  },
+  container: {
+    // shadowOffset: { width: 0, height: 3 },
+    // shadowRadius: 6,
+    // shadowColor: '#000',
+    // shadowOpacity: 0.1,
+    backgroundColor: '#FFF'
+  },
+  image: {
+    resizeMode: 'cover'
+  }
+});
 
 export default UserAvatar;

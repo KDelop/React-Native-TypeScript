@@ -1,13 +1,9 @@
 import * as React from 'react';
 
-import Typography from './designSystem/Typography';
+import GenericLogoView from './GenericLogoView';
 
-const LoadingView = () => {
-  return (
-    <>
-      <Typography>LOADING...</Typography>
-    </>
-  );
+const LoadingView: React.SFC = () => {
+  return <GenericLogoView />;
 };
 
 export default LoadingView;

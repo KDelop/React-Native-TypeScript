@@ -1,152 +1,156 @@
 import * as React from 'react';
-import {useMachine} from '@xstate/react';
-import IonIcon from 'react-native-vector-icons/Ionicons';
-import {FlatList, StyleSheet, TouchableOpacity, View} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { View, StyleSheet, FlatList, Dimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {isSameDay, format, isSameMonth, startOfMonth} from 'date-fns';
+import moment from 'moment';
 
-import {BLUE_GREY, BRAND_BLUE} from './colors';
-import TitledViewHeader from './designSystem/TitledViewHeader';
+import BasicHeader from './BasicHeader';
+import ScheduleMonthItem from './ScheduleMonthItem';
+import ScheduleDateItem, { DATE_ITEM_WIDTH } from './ScheduleDateItem';
 import ScheduleItem from './ScheduleItem';
-import Calendar from './designSystem/Calendar';
-import Padded from './designSystem/Padded';
-import ListPlaceholder from './designSystem/ListPlaceholder';
-import {UserContext} from './UserProvider';
-import scheduleMachine, {createScheduleKey} from '../machines/schedule';
+import VerticalScrollList from './VerticalScrollList';
 
-const buildDateMapKey = (date: number | Date) => format(date, 'dd-MM-yyyy');
+function daysOfMonth(date: moment.Moment) {
+  const days = [];
+  for (let i = 1; i <= date.daysInMonth(); i++) {
+    days.push(
+      date
+        .clone()
+        .date(i)
+        .startOf()
+    );
+  }
+  return days;
+}
 
 const ScheduleView = () => {
-  const userContext = React.useContext(UserContext);
-  const [selectedDate, setSelectedDate] = React.useState(new Date());
-  const [state, dispatch] = useMachine(scheduleMachine);
-  const {navigate} = useNavigation();
+  const [currentDate, setCurrentDate] = React.useState(moment());
 
-  const goToNewScheduleView = () => {
-    navigate('NewScheduleItem');
-  };
-
-  const schedule =
-    state.context.schedule[createScheduleKey(state.context.date)] ?? [];
-
-  const todaysSchedule = schedule.filter((x) =>
-    isSameDay(parseInt(x.startAt), selectedDate),
-  );
-
-  const navigateToGroupCall = (channelId: string) =>
-    navigate('GroupCall', {channelId});
-
-  const navigateToStream = (streamId: string, isHost: boolean) =>
-    navigate('Stream', {streamId, isHost});
-
-  const handleDayChange = React.useCallback((x) => setSelectedDate(x), []);
-  const handleMonthChange = React.useCallback(
-    (x) => {
-      dispatch('MONTH_CHANGED', {
-        date: x,
-      });
-    },
-    [dispatch],
-  );
-
-  const handleBeforeMonthChange = React.useCallback((x: Date) => {
-    if (!isSameMonth(x, new Date())) {
-      setSelectedDate(startOfMonth(x));
-    } else {
-      setSelectedDate(new Date());
-    }
-  }, []);
-
-  const isSelected = React.useCallback((x) => isSameDay(x, selectedDate), [
-    selectedDate,
+  const dateItems = React.useMemo(() => daysOfMonth(currentDate), [
+    currentDate.month()
   ]);
 
-  const markedDates = schedule.reduce(
-    (acc, x) => ({
-      ...acc,
-      [buildDateMapKey(parseInt(x.startAt))]: true,
-    }),
-    {} as Record<string, boolean>,
+  const dateOnPress = React.useCallback(
+    (x: number) => {
+      setCurrentDate(currentDate.clone().date(x));
+    },
+    [currentDate.format()]
+  );
+
+  const monthOnPress = React.useCallback(
+    (x: number) => {
+      setCurrentDate(currentDate.clone().month(x));
+    },
+    [currentDate.format()]
   );
 
   return (
-    <>
-      <TitledViewHeader
-        showBackButton={false}
-        dropShadowStyle="none"
-        title="Schedule"
-        rightAdornment={
-          <TouchableOpacity onPress={goToNewScheduleView}>
-            <IonIcon name="ios-add" size={24} color={BRAND_BLUE} />
-          </TouchableOpacity>
-        }
+    <View style={styles.root}>
+      <BasicHeader title="Schedule" />
+      <VerticalScrollList
+        data={moment.months()}
+        keyExtractor={item => item}
+        selectedIndex={currentDate.month()}
+        viewOffset={22}
+        style={styles.monthFlatList}
+        contentContainerStyle={styles.monthContainer}
+        renderItem={({ item, index }) => (
+          <ScheduleMonthItem
+            selected={currentDate.format('MMMM') === item}
+            onPress={() => monthOnPress(index)}
+            fullWidth={index === 11}
+          >
+            {item}
+          </ScheduleMonthItem>
+        )}
       />
-      <LinearGradient locations={[0, 0.3]} colors={['#f6f6f6', 'white']}>
-        <Padded size={{left: 5, right: 5, top: 4, bottom: 4}}>
-          <Calendar
-            onDateClick={handleDayChange}
-            onBeforeMonthChange={handleBeforeMonthChange}
-            onMonthChange={handleMonthChange}
-            isSelected={isSelected}
-            markedDates={markedDates}
-          />
-        </Padded>
-      </LinearGradient>
-      <FlatList
-        data={todaysSchedule}
-        keyExtractor={(x) => x.id}
-        style={{backgroundColor: BLUE_GREY}}
-        ListEmptyComponent={() => {
-          // if (scheduleResponse.status === 'loading') {
-          //   //TODO: show loading indicator
-          // }
-
-          if (todaysSchedule.length === 0) {
-            return (
-              <Padded size={{top: 5}} style={styles.centerPlaceholder}>
-                <ListPlaceholder.NoScheduledItems />
-              </Padded>
-            );
+      <View style={styles.datePaper}>
+        <LinearGradient
+          colors={['#FFFFFFDD', '#FFFFFF00', '#FFFFFFDD']}
+          locations={[0.15, 0.5, 0.85]}
+          angle={90}
+          useAngle={true}
+          style={styles.datePaperGradient}
+          pointerEvents="none"
+        />
+        <VerticalScrollList
+          data={dateItems}
+          keyExtractor={x => String(x.date())}
+          contentContainerStyle={styles.dateContainer}
+          getItemLayout={(item, index) => ({
+            length: DATE_ITEM_WIDTH,
+            offset: DATE_ITEM_WIDTH * index,
+            index
+          })}
+          viewOffset={
+            (Dimensions.get('screen').width - DATE_ITEM_WIDTH - 12) / 2
           }
-
-          return null;
-        }}
-        renderItem={({item, index}) => {
-          return (
-            <ScheduleItem
-              startAt={parseInt(item.startAt)}
-              title={item.title}
-              description={item.description}
-              isFirstItem={index === 0}
-              attendees={item.attendees}
-              type={item.type}
-              initiatedBy={{
-                firstName: item.initiatedBy.firstName,
-                lastName: item.initiatedBy.lastName,
-                id: item.initiatedBy.id,
-                isPro: item.initiatedBy.isPro,
-              }}
-              onPress={() =>
-                item.type === 'GROUP_CALL'
-                  ? navigateToGroupCall(item.id)
-                  : navigateToStream(
-                      item.id,
-                      item.initiatedBy?.id === userContext?.user?.uid,
-                    )
-              }
-            />
-          );
-        }}
+          selectedIndex={currentDate.date() - 1}
+          renderItem={({ item }) => (
+            <ScheduleDateItem
+              onPress={() => dateOnPress(item.date())}
+              selected={currentDate.date() === item.date()}
+              subtitle={item.format('ddd')}
+            >
+              {item.date()}
+            </ScheduleDateItem>
+          )}
+        />
+      </View>
+      <FlatList
+        keyExtractor={x => 'key:' + x}
+        contentContainerStyle={[styles.scheduleContainer]}
+        data={[1, 2]}
+        renderItem={() => (
+          <ScheduleItem
+            title="Appointment with Mia"
+            summary="Working on weight loss"
+            gutterBottom
+          />
+        )}
       />
-    </>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  centerPlaceholder: {
-    alignItems: 'center',
+  root: {
+    flex: 1
   },
+  monthFlatList: {
+    flexGrow: 0
+  },
+  monthContainer: {
+    paddingTop: 8,
+    paddingLeft: 22,
+    paddingRight: 22
+  },
+  datePaperGradient: {
+    position: 'absolute',
+    zIndex: 1,
+    top: 0,
+    left: 0,
+    height: '100%',
+    width: '100%'
+  },
+  datePaper: {
+    position: 'relative',
+    borderRadius: 6,
+    marginRight: 12,
+    marginLeft: 12,
+    backgroundColor: '#FFF',
+    shadowOffset: { width: 0, height: 14 },
+    shadowRadius: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.05
+  },
+  dateContainer: {
+    paddingTop: 22,
+    paddingBottom: 16
+  },
+  scheduleContainer: {
+    flexGrow: 1,
+    paddingTop: 18
+  }
 });
 
 export default ScheduleView;
