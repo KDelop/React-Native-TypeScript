@@ -1,0 +1,45 @@
+Resources:
+  ServerlessSubnetA:
+    DependsOn: ServerlessVPC
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: ServerlessVPC
+      AvailabilityZone: ${self:provider.region}a
+      CidrBlock: 10.0.0.0/24
+      Tags:
+        - Key: 'Name'
+          Value: 'ServerlessSubnetA'
+  ServerlessSubnetB:
+    DependsOn: ServerlessVPC
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: ServerlessVPC
+      AvailabilityZone: ${self:provider.region}b
+      CidrBlock: 10.0.1.0/24
+      Tags:
+        - Key: 'Name'
+          Value: 'ServerlessSubnetB'
+  ServerlessSubnetC:
+    DependsOn: ServerlessVPC
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: ServerlessVPC
+      AvailabilityZone: ${self:provider.region}c
+      CidrBlock: 10.0.2.0/24
+      Tags:
+        - Key: 'Name'
+          Value: 'ServerlessSubnetC'
+  ServerlessSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: 'RDS Subnet Group'
+      SubnetIds:
+        - Ref: ServerlessSubnetA
+        - Ref: ServerlessSubnetB
+        - Ref: ServerlessSubnetC
+      Tags:
+        - Key: 'Name'
+          Value: 'ServerlessSubnetGroup'

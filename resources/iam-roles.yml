@@ -1,0 +1,135 @@
+Resources:
+  AuthRole:
+    Type: AWS::IAM::Role
+    Description: 'Role that the an authenticated user assumes'
+    Properties:
+      RoleName: ${self:provider.apiname}-auth
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: appsync.amazonaws.com
+            Action: sts:AssumeRole
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+          - Effect: Allow
+            Principal:
+              Federated: cognito-identity.amazonaws.com
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              ForAnyValue:StringLike:
+                'cognito-identity.amazon.com:amr': 'authenticated'
+      Policies:
+        - PolicyName: ${self:provider.apiname}-lambda
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: '*'
+        - PolicyName: ${self:provider.apiname}-log-stream
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogStreams
+                Resource: '*'
+        - PolicyName: ${self:provider.apiname}-ec2
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:CreateNetworkInterface
+                  - ec2:DeleteNetworkInterface
+                  - ec2:DescribeInstances
+                  - ec2:AttachNetworkInterface
+                Resource: '*'
+        - PolicyName: ${self:provider.apiname}-rds
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - rds:*
+                Resource:
+                  - {
+                      Fn::Join:
+                        [
+                          '',
+                          [
+                            'arn:aws:rds:${self:provider.region}::',
+                            { Ref: AWS::AccountId },
+                            ':db:',
+                            { Ref: PostgreSqlRDSInstance },
+                          ],
+                        ],
+                    }
+        - PolicyName: ${self:provider.apiname}-rds-connect
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - rds-db:connect
+                Resource:
+                  - {
+                      Fn::Join:
+                        [
+                          '',
+                          [
+                            'arn:aws:rds-db:${self:provider.region}:',
+                            { Ref: AWS::AccountId },
+                            ':dbuser:db-JDDUYCLGSWTSGELGN2JWCLUVGA/${self:provider.environment.IAM_USERNAME}',
+                          ],
+                        ],
+                    }
+
+  SmsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /service-role/
+      RoleName: ${self:provider.apiname}-sms
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cognito-idp.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                { sts:ExternalId: '778d88c6-9a57-11ea-bb37-0242ac130002' }
+      Policies:
+        - PolicyName: ${self:provider.apiname}-sns-publish
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: sns:publish
+                Resource: '*'
+
+  UnAuthRole:
+    Type: AWS::IAM::Role
+    Description: 'Role that the an authenticated user assumes'
+    Properties:
+      RoleName: ${self:provider.apiname}-unauth
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: cognito-identity.amazonaws.com
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              ForAnyValue:StringLike:
+                'cognito-identity.amazon.com:amr': 'unauthenticated'

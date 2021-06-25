@@ -1,0 +1,170 @@
+service:
+  name: athleticus-serverless
+
+resources:
+  - ${file(./resources/cognito-user-pool.yml)}
+  - ${file(./resources/identity-pool.yml)}
+  - ${file(./resources/iam-roles.yml)}
+  - ${file(./resources/postgres-db.yml)}
+  - ${file(./resources/security-group.yml)}
+  - ${file(./resources/subnet.yml)}
+  - ${file(./resources/vpc.yml)}
+  - ${file(./resources/route.yml)}
+  - ${file(./resources/internet-gateway.yml)}
+
+custom:
+  USERNAME: athleticus
+  PASSWORD: password
+  POSTGRESQL:
+    HOST:
+      Fn::GetAtt: [PostgreSqlRDSInstance, Endpoint.Address]
+    PORT:
+      Fn::GetAtt: [PostgreSqlRDSInstance, Endpoint.Port]
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+  appSync:
+    name: ${self:provider.apiname}
+    region: ${self:provider.region}
+    authenticationType: AMAZON_COGNITO_USER_POOLS
+    serviceRole: 'AppSyncServiceRole'
+    userPoolConfig:
+      awsRegion: us-east-1
+      defaultAction: ALLOW
+      userPoolId: 'us-east-1_3eYkMlQpp'
+    dataSources:
+      - type: AWS_LAMBDA
+        name: 'UsersDs'
+        description: 'Lambda Users Data Source'
+        config:
+          functionName: usersDs
+          serviceRoleArn: { Fn::GetAtt: [AuthRole, Arn] }
+      - type: AWS_LAMBDA
+        name: 'ChatDs'
+        description: 'Lambda Chat Data Source'
+        config:
+          functionName: chatDs
+          serviceRoleArn: { Fn::GetAtt: [AuthRole, Arn] }
+    mappingTemplates:
+      # User Data Sources
+      - type: Query
+        field: allUsers
+        dataSource: 'UsersDs'
+        request: 'query.allUsers.vtl'
+        response: 'response.vtl'
+      - type: Query
+        field: allTeammates
+        dataSource: 'UsersDs'
+        request: 'query.allTeammates.vtl'
+        response: 'response.vtl'
+      - type: Query
+        field: currentUser
+        dataSource: 'UsersDs'
+        request: 'query.currentUser.vtl'
+        response: 'response.vtl'
+      - type: Query
+        field: user
+        dataSource: 'UsersDs'
+        request: 'query.user.vtl'
+        response: 'response.vtl'
+      - type: Mutation
+        field: inviteToTeam
+        dataSource: 'UsersDs'
+        request: 'mutation.inviteToTeam.vtl'
+        response: 'response.vtl'
+      - type: Mutation
+        field: updateTeamInvite
+        dataSource: 'UsersDs'
+        request: 'mutation.updateTeamInvite.vtl'
+        response: 'response.vtl'
+      # Chat Data Sources
+      - type: Mutation
+        field: createRoom
+        dataSource: 'ChatDs'
+        request: 'mutation.createRoom.vtl'
+        response: 'response.vtl'
+      - type: Mutation
+        field: sendMessage
+        dataSource: 'ChatDs'
+        request: 'mutation.sendMessage.vtl'
+        response: 'response.vtl'
+      - type: Query
+        field: roomByParticipants
+        dataSource: 'ChatDs'
+        request: 'query.roomByParticipants.vtl'
+        response: 'response.vtl'
+      - type: Mutation
+        field: impressRoom
+        dataSource: 'ChatDs'
+        request: 'mutation.impressRoom.vtl'
+        response: 'response.vtl'
+      - type: Query
+        field: allRooms
+        dataSource: 'ChatDs'
+        request: 'query.allRooms.vtl'
+        response: 'response.vtl'
+      - type: Query
+        field: room
+        dataSource: 'ChatDs'
+        request: 'query.room.vtl'
+        response: 'response.vtl'
+      - type: Query
+        field: allMessages
+        dataSource: 'ChatDs'
+        request: 'query.allMessages.vtl'
+        response: 'response.vtl'
+      - type: Room
+        field: participants
+        dataSource: 'ChatDs'
+        request: 'room.participants.vtl'
+        response: 'response.vtl'
+      - type: Room
+        field: lastMessage
+        dataSource: 'ChatDs'
+        request: 'room.lastMessage.vtl'
+        response: 'response.vtl'
+
+plugins:
+  - serverless-webpack
+  - serverless-appsync-plugin
+
+provider:
+  apiname: athleticus
+  name: aws
+  stage: dev
+  runtime: nodejs12.x
+  vpc:
+    securityGroupIds:
+      - Ref: ServerlessSecurityGroup
+    subnetIds:
+      - Ref: ServerlessSubnetA
+      - Ref: ServerlessSubnetB
+      - Ref: ServerlessSubnetC
+  apiGateway:
+    minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
+  environment:
+    POSTGRESQL_HOST: ${self:custom.POSTGRESQL.HOST}
+    POSTGRESQL_PORT: ${self:custom.POSTGRESQL.PORT}
+    DB_NAME: ${self:provider.apiname}
+    USERNAME: ${self:custom.USERNAME}
+    IAM_USERNAME: athleticus_iam
+    PASSWORD: ${self:custom.PASSWORD}
+    GRAPHQL_API: { Fn::GetAtt: [GraphQlApi, GraphQLUrl] }
+    REGION: ${self:provider.region}
+    NODE_TLS_REJECT_UNAUTHORIZED: 0
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+
+functions:
+  usersDs:
+    handler: handlers/handler.usersDs
+    role: AuthRole
+  chatDs:
+    handler: handlers/handler.chatDs
+    role: AuthRole
+  postAuthentication:
+    handler: handlers/handler.postAuthentication
+    role: AuthRole
+    events:
+      - cognitoUserPool:
+          pool: AthleticusPool
+          trigger: PostAuthentication

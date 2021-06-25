@@ -1,0 +1,17 @@
+Resources:
+  PostgreSqlRDSInstance:
+    DependsOn: ServerlessVPCGA
+    Type: AWS::RDS::DBInstance
+    Properties:
+      MasterUsername: ${self:custom.USERNAME}
+      MasterUserPassword: ${self:custom.PASSWORD}
+      AllocatedStorage: 10
+      EnableIAMDatabaseAuthentication: true
+      DBName: ${self:provider.apiname}
+      DBInstanceClass: db.t2.micro
+      VPCSecurityGroups:
+        - !GetAtt ServerlessSecurityGroup.GroupId
+      DBSubnetGroupName:
+        Ref: ServerlessSubnetGroup
+      Engine: postgres
+      PubliclyAccessible: true

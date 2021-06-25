@@ -1,0 +1,22 @@
+Resources:
+  IdentityPool:
+    Type: AWS::Cognito::IdentityPool
+    Description: 'Federation for the User Pool members to access AWS resources'
+    Properties:
+      IdentityPoolName: ${self:provider.apiname}_identities
+      AllowUnauthenticatedIdentities: true
+      CognitoIdentityProviders:
+        - ClientId:
+            Ref: CognitoUserPoolClientIAM
+          ProviderName:
+            Fn::GetAtt: [CognitoUserPoolAthleticusPool, 'ProviderName']
+
+  IdentityPoolRoleMap:
+    Type: AWS::Cognito::IdentityPoolRoleAttachment
+    Description: 'Links the unauthenticated and authenticated policies to the identity pool'
+    Properties:
+      IdentityPoolId:
+        Ref: IdentityPool
+      Roles:
+        unauthenticated: { Fn::GetAtt: [UnAuthRole, Arn] }
+        authenticated: { Fn::GetAtt: [AuthRole, Arn] }

@@ -1,0 +1,74 @@
+enum TeammateStatus {
+  REQUEST_SENT
+  REQUEST_RECEIVED
+  TEAMMATES
+  NONE
+}
+
+type User {
+  id: ID
+  name: String
+  dateOfBirth: String
+  lastLoginAt: String
+  teammateStatus: TeammateStatus
+}
+
+type BasicUser {
+  id: ID
+  name: String
+  dateOfBirth: String
+  lastLoginAt: String
+}
+
+type UserPage {
+  nextOffset: Int
+  users: [User]
+}
+
+type Message {
+  id: ID
+  body: String
+  sentByUserId: ID
+  createdAt: String
+}
+
+type MessagePage {
+  nextOffset: Int
+  messages: [Message]
+}
+
+type Room {
+  id: ID
+  participants: [BasicUser]
+  lastMessage: Message
+  lastImpressionAt: String
+}
+
+type RoomPage {
+  nextOffset: Int
+  rooms: [Room]
+}
+
+type Mutation {
+  inviteToTeam(toUserId: ID!): User
+  updateTeamInvite(fromUserId: ID!, accepted: Boolean!): User
+  impressRoom(roomId: ID!, impressionAt: String): Room
+  createRoom(participants: [ID!], firstMessageBody: String!): Room
+  sendMessage(roomId: ID!, body: String!): Message
+}
+
+type Query {
+  allUsers(limit: Int, offset: Int): UserPage
+  allTeammates(pending: Boolean, limit: Int, offset: Int): UserPage
+  allRooms(limit: Int, offset: Int): RoomPage
+  allMessages(roomId: ID!, before: ID, limit: Int, offset: Int): MessagePage
+  user(userId: ID!): BasicUser
+  room(roomId: ID!): Room
+  roomByParticipants(participants: [ID!]): Room
+  currentUser: BasicUser
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+}

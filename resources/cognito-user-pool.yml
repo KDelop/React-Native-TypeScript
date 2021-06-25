@@ -1,0 +1,69 @@
+Resources:
+  CognitoUserPoolAthleticusPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: ${self:provider.apiname}-user-pool
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: true
+        - Name: name
+          Required: true
+          Mutable: true
+        - Name: birthdate
+          Required: true
+          Mutable: true
+      MfaConfiguration: OPTIONAL
+      EnabledMfas:
+        - SMS_MFA
+      AutoVerifiedAttributes:
+        - email
+        - phone_number
+      SmsConfiguration:
+        SnsCallerArn: { Fn::GetAtt: [SmsRole, Arn] }
+        ExternalId: '778d88c6-9a57-11ea-bb37-0242ac130002'
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+          - Name: verified_phone_number
+            Priority: 2
+      UsernameAttributes:
+        - email
+        - phone_number
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 6
+          RequireLowercase: true
+          RequireUppercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+
+  CognitoUserPoolClientIAM:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: ${self:provider.apiname}-user-pool-client-iam
+      UserPoolId:
+        Ref: CognitoUserPoolAthleticusPool
+      ExplicitAuthFlows:
+        - ADMIN_NO_SRP_AUTH
+      GenerateSecret: true
+
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: ${self:provider.apiname}-user-pool-client
+      UserPoolId:
+        Ref: CognitoUserPoolAthleticusPool
+      ExplicitAuthFlows:
+        - ADMIN_NO_SRP_AUTH
+      GenerateSecret: false
+
+Outputs:
+  UserPoolId:
+    Value:
+      Ref: CognitoUserPoolAthleticusPool
+
+  UserPoolClientId:
+    Value:
+      Ref: CognitoUserPoolClient
